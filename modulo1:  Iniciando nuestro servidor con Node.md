@@ -257,3 +257,137 @@ Typescript lenguaje de tipado estatico los tipos se comprueban en _tiempo de com
 Javascript lenguaje de tipado dinamico los tipos se verifican en _tiempo de ejecución_.
 
 Typescript es una herramienta de desarrollo ya que los clientes ni servidores reconocen el codigo en Typescript
+
+## Añadiendo Typescript a nuestro servidor
+
+Para configurar nunestro servidor Node en un proyecto Typescript debemos instalar las ultima librerias `typescript` y `ts-node` como dependencias de desarrollo.
+`typescript` -> es la lib principal de Typescript que nos ayuara a compilar nuestro codigo a javascript valido.
+`ts-node` -> es una libreria de utilidades que nos ayuda a ejecutar programas typescript en Node.
+
+```shell
+cd server/
+npm install -D typescript ts-node
+```
+
+### tsconfig.json
+
+Para agregar typescript a nuestro proyecto primero debemos crear en el directorio server/ el archivo `tinyhouse_v1/server/tsconfig.json` que es un archivo de configuración typescript donde podemos personalizar nuestra configuración de TypeScript y guiar nuestro compilador de TypeScript con las opciones necesarias para compilar el proyecto.
+
+Para personalizar el compilador crearemos una llave `compilerOptions`. Dentro de esta llave hay muchas opciones que podemos ver en [ts CLI Options](https://www.typescriptlang.org/docs/handbook/compiler-options.html) pero para esta app usaremos las siguientes propiedades:
+
+**target**: version de js de destino
+**module**:administrador de modulos en la salida de js compilada, CommonJS es el estandar de Node
+**rootDir**: ubicacion de archivos donde declarar codigo typescript, y donde queremos que compile el codigo typescript
+**outDir**: ubicacion donde queremos generar el codigo compilado, cuando intentemos compilar nuestro proyecto
+**esModuleInterop**: ayudar a compilar los modulos CommonJS de acuerdo a los modulos ES6 esta propiedad debe estar en true
+**strict**: Se aplicar esta opción ya que permite a una serie de opciones de comprobación de tipo estrictas tales como `noImplicitAny`, `noImplicitThis`, `strictNullChecks`, y así sucesivamente.
+
+```json
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "strict": true
+  }
+}
+```
+
+### @types
+
+Para usar libreria de tercero o no escritas en typescript por ejemplo express y poder usar todo el poder de Typescript, estas librerias tambien deberian tener tipos dinamicos (tipado dinamico).
+Typescritp permite la creacion de `archivos de declaracion` o [declaration files](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html) que describen la forma del codigo javascript existente. En la comunidad TypeScript existe un repositorio [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) que contiene archivos de declaración de TypeScript para una gran cantidad de paquetes y está totalmente impulsado por la comunidad.
+
+Entonces dado que node y express no estan escritos en Typescript debemos instalar definiciones de tipo de archivos de declaracion de Typescript para estos paquetes, estas las instalaremos como dependencias de desarrollo.
+
+`@types` hace referencia a los paquetes de archivos de declaracion de Typescript que estan en el repositorio de GitHub [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped).
+Entonces dentro de la carpeta server/ ejecutamos la siguiente linea:
+
+```shell
+npm install -D @types/node @types/express
+```
+
+Con los paquetes de definición de tipos podemos empezar a modificar nuestro codigo:.
+
+Primero cambiamos la extension de nuestro archivo `tinyhouse_v1/server/src/index.js` a `tinyhouse_v1/server/src/index.ts`
+
+En `index.ts` podemos empezar a usar `ES6 import` para importar express en lugar de require.
+
+### Tipado estatico
+
+Esta es la caracteristica principal de Typescritp, ejm en nuestras constantes en lugar de dejar que infieran como numeros, podemos asignar estaticamente el tipo a esas variables en este caso como `:number`
+
+```ts
+const one: number = 1;
+const two: number = 2;
+```
+
+Typescript nos permite usar muchos [tipos básicos](https://www.typescriptlang.org/docs/handbook/basic-types.html) diferentes:
+
+```ts
+const three: boolean = false;
+const three: string = "one";
+const three: null = null;
+const three: undefined = undefined;
+const three: any = {};
+```
+
+Existen otros tipos básicos como el [tipo matriz](https://www.typescriptlang.org/docs/handbook/basic-types.html#array)
+
+```ts
+let list: number[] = [1, 2, 3];
+```
+
+El tipo [enum](https://www.typescriptlang.org/docs/handbook/basic-types.html#enum)
+
+```ts
+enum Color {
+  Red,
+  Green,
+  Blue,
+}
+let c: Color = Color.Green;
+```
+
+El tipo [void](https://www.typescriptlang.org/docs/handbook/basic-types.html#void)
+
+```ts
+function warnUser(): void {
+  console.log("This is my warning message");
+}
+```
+
+Al definir explicitamente el tipo de variable, debemos proporcionarle un valor que coincida con ese tipo.
+
+El tipo `any` en typescript es unico ya que nos permite defininr una variable con cualquier tipo. **Este tipo debe usarse con moderación**
+
+### Iniciando el servidor Node Typescript
+
+Según nuestro script `start` dentro de `package.json` usa nodemon, el cual buscara archivos javascript por defecto en src/. Dado que ahora usamos typescript debemos cambiar el script `start` y ser mas explicitos con que archivo debe ejecutar nodemon.
+
+```json
+ "scripts": {
+    "start": "nodemon src/index.ts"
+  },
+```
+
+Ejecutamos nuestro script `npm run start`
+
+Ahora vemos que en la consola nodemon muestra que ejecuta `ts-node src/index/ts`. Se esta utilizando el paquete `ts-node` para ejecutar la app Typescript directamente desde el terminal.
+
+```shell
+> tinyhouse-v1-server@0.1.0 start
+> nodemon src/index.ts
+
+[nodemon] 2.0.7
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: ts,json
+[nodemon] starting `ts-node src/index.ts`
+[app] : http://localhost:9000
+```
+
+También gracias a `nodemon` cada vez que se modifique un archivo `.ts` volverá a ejecutar el servidor usando el paquete `ts-node`.
+`ts-node` por debajo hace un monto de comprobaciones para verificar que todo nuestro código TypeScript es correcto al compilar de typescript a codigo javascript valido. En caso de haber un error d e typescript, nodemon se bloqueara y mostrara el diagnostico de errores.
