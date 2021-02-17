@@ -219,3 +219,41 @@ y obtendremos esta salida porque nodemon ejecutara la linea `node /src` que esta
 [nodemon] starting `node src/`
 [app] : http://localhost:9000
 ```
+
+## Typescript
+
+Js es un lenguaje de tipado debil, es decir podemos un tipo de datos a una variable y luego asignar otro. Ejm
+
+```js
+const one = 1;
+const two = 2;
+...
+app.get("/", (req, res) => res.send(`1 + 2 = ${one + two}`));
+```
+
+Si las 2 constantes y las sumamos recibiremos una respuesta de `1 + 2 = 3`.
+
+PEro si reasignamos el valor de `two` a un string:
+
+```js
+const one = 1;
+let two = 2;
+
+two = "two";
+...
+app.get("/", (req, res) => res.send(`1 + 2 = ${one + two}`));
+```
+
+Recibiremos `1 + 2 = 1two`
+
+Por esta razón se creo Typescript, que es un superset de JavaScript fuertemente tipado, Microsoft lo creo para:
+
+- Que el código sea más fácil de leer y comprender.
+- Evitar errores dolorosos que los desarrolladores suelen encontrar al escribir JavaScript.
+- En última instancia, ahorrar tiempo y esfuerzo a los desarrolladores
+
+Typescript no es diferente a javascript en realidad es una extensión escrita de JavaScript.
+Typescript lenguaje de tipado estatico los tipos se comprueban en _tiempo de compilación_.
+Javascript lenguaje de tipado dinamico los tipos se verifican en _tiempo de ejecución_.
+
+Typescript es una herramienta de desarrollo ya que los clientes ni servidores reconocen el codigo en Typescript
