@@ -168,3 +168,54 @@ node src/
 ```
 
 Nos mostrara en la consola el mensaje `[app] : http://localhost:9000` y si ingresamos a esa url desde el navegador veremos el mensaje `hello world!`.
+
+## Recarga automática usando Nodemon
+
+[Nodemon](https://nodemon.io/) es una herramienta monitoreará cualquier cambio en nuestro código fuente y reiniciará automáticamente nuestro servidor Node.
+
+Para instalarlo usaremos npm pero con la bandera `-D` que es una abreviacion de `--save-dev`, esto indica que se instalara como dependencia de desarrollo, es decir solo se necesita para desarrollo local:
+
+```shell
+cd server
+npm install -D nodemon
+```
+
+### Iniciar script
+
+Para usar nodemon crearemos en nuestro `package.json` un script `start`
+
+```json
+{
+  "name": "tinyhouse-v1-server",
+  "version": "0.1.0",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "scripts": {
+    "start": "nodemon src/"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
+```
+
+Ahora para ejecutar nuestro servidor usamos:
+
+```shell
+npm run start
+```
+
+y obtendremos esta salida porque nodemon ejecutara la linea `node /src` que esta en el script `start` que creamos:
+
+```shell
+> tinyhouse-v1-server@0.1.0 start
+> nodemon src/
+
+[nodemon] 2.0.7
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node src/`
+[app] : http://localhost:9000
+```
