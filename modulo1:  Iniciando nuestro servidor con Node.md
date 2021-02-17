@@ -115,3 +115,56 @@ Si usáramos yarn(otra herramienta de administración de dependencias) en lugar 
 
 Ahora vamos a usar `Express` para crear una instanacia de un servidor Node.
 Primero movemos `index.js` a una carpeta `src/` donde escribiremos el código fuente de nuestro servidor.
+
+En el archivo `index.js` borramos lo anterior y empezaremos a escribir lo siguiente:
+
+Importamos o requerimos express:
+
+```js
+const express = require("express");
+```
+
+Luego creamos una instancia del sevidor ejecutando `express()` y asignadolo a una constante `app`.
+
+```js
+const app = express();
+```
+
+Creamos una constante para asignar un numero del puertoque usara el servidor:
+
+```js
+const port = 9000;
+```
+
+Al ser `app` la instancia del servidor podemos usar enrutamiento rapido y usar `app.get()` para asociar una ruta con un endpoint. Entonces cuando recibamos una solicitud HTTP GET a la ruta indice indicada por `/`, el servidor respondera `hello world!`. Esta funcion del endpoint tiene 2 objetos como parametros `req` y `res`. El objeto `req` contiene información sobre la solicitud http. Con el objeto `res` es como enviamos la respuesta deseada.
+
+```js
+app.get("/", (req, res) => res.send("hello world"));
+```
+
+Finalmente creamos el servidor node en el puerto determinado usando la funcion listen de express.
+
+```js
+app.listen(port);
+```
+
+Para mayor comodidad, colocaremos un mensaje al final de nuestro archivo usando un `console.log` para informar que nuestra aplicación se está ejecutando correctamente en el puerto apropiado. Con todos los cambios anteriores:
+
+```js
+const express = require("express");
+const app = express();
+const port = 9000;
+
+app.get("/", (req, res) => res.send("hello world!"));
+app.listen(port);
+
+console.log(`[app] : http://localhost:${port}`);
+```
+
+Luego podemos ejecutar esto escribiendo lo siguiente en nuestro terminal:
+
+```shell
+node src/
+```
+
+Nos mostrara en la consola el mensaje `[app] : http://localhost:9000` y si ingresamos a esa url desde el navegador veremos el mensaje `hello world!`.

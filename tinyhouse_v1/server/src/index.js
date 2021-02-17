@@ -1,5 +1,8 @@
-console.log("Hello world!");
-const one = 1;
-const two = 2;
+const express = require("express");
+const app = express();
+const port = 9000;
 
-console.log(`1 + 2 = ${one + two}`);
+app.get("/", (req, res) => res.send("hello world!"));
+app.listen(port);
+
+console.log(`[app] : http://localhost:${port}`);
