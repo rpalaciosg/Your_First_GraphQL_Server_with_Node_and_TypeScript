@@ -260,9 +260,9 @@ Typescript es una herramienta de desarrollo ya que los clientes ni servidores re
 
 ## Añadiendo Typescript a nuestro servidor
 
-Para configurar nunestro servidor Node en un proyecto Typescript debemos instalar las ultima librerias `typescript` y `ts-node` como dependencias de desarrollo.
-`typescript` -> es la lib principal de Typescript que nos ayuara a compilar nuestro codigo a javascript valido.
-`ts-node` -> es una libreria de utilidades que nos ayuda a ejecutar programas typescript en Node.
+Para configurar nuestro servidor Node en un proyecto Typescript debemos instalar las ultimas versiones de las librerias `typescript` y `ts-node` como dependencias de desarrollo.
+`typescript` -> es la lib principal de Typescript que nos ayudará a compilar nuestro codigo a javascript valido.
+`ts-node` -> es una librería de utilidades que nos ayuda a ejecutar programas typescript en Node.
 
 ```shell
 cd server/
@@ -313,11 +313,15 @@ Con los paquetes de definición de tipos podemos empezar a modificar nuestro cod
 
 Primero cambiamos la extension de nuestro archivo `tinyhouse_v1/server/src/index.js` a `tinyhouse_v1/server/src/index.ts`
 
-En `index.ts` podemos empezar a usar `ES6 import` para importar express en lugar de require.
+En `index.ts` podemos empezar a usar `ES6 import` para importar express, en lugar de `require` de CommonJS.
 
-### Tipado estatico
+```ts
+import express from "express";
+```
 
-Esta es la caracteristica principal de Typescritp, ejm en nuestras constantes en lugar de dejar que infieran como numeros, podemos asignar estaticamente el tipo a esas variables en este caso como `:number`
+### Tipado estático
+
+Esta es la característica principal de Typescript, ejm en nuestras constantes en lugar de dejar que infieran (motor js dedusca) como números, podemos asignar estáticamente el tipo a esas variables en este caso como `:number`
 
 ```ts
 const one: number = 1;
@@ -359,13 +363,13 @@ function warnUser(): void {
 }
 ```
 
-Al definir explicitamente el tipo de variable, debemos proporcionarle un valor que coincida con ese tipo.
+Al definir explícitamente el tipo de variable, debemos proporcionarle un valor que coincida con ese tipo.
 
-El tipo `any` en typescript es unico ya que nos permite defininr una variable con cualquier tipo. **Este tipo debe usarse con moderación**
+El tipo `any` en typescript es único ya que nos permite definir una variable con cualquier tipo. **Este tipo debe usarse con moderación**
 
 ### Iniciando el servidor Node Typescript
 
-Según nuestro script `start` dentro de `package.json` usa nodemon, el cual buscara archivos javascript por defecto en src/. Dado que ahora usamos typescript debemos cambiar el script `start` y ser mas explicitos con que archivo debe ejecutar nodemon.
+Según nuestro script `start` dentro de `package.json` usa nodemon, el cual buscara archivos javascript por defecto en src/. Dado que ahora usamos typescript debemos cambiar el script `start` y ser mas explícitos con que archivo debe ejecutar nodemon en este caso el `index.ts`.
 
 ```json
  "scripts": {
@@ -375,7 +379,7 @@ Según nuestro script `start` dentro de `package.json` usa nodemon, el cual busc
 
 Ejecutamos nuestro script `npm run start`
 
-Ahora vemos que en la consola nodemon muestra que ejecuta `ts-node src/index/ts`. Se esta utilizando el paquete `ts-node` para ejecutar la app Typescript directamente desde el terminal.
+Ahora vemos que en la consola nodemon muestra que ejecuta `ts-node src/index.ts`. Se esta utilizando el paquete `ts-node` en lugar de `node` para ejecutar la app Typescript directamente desde el terminal.
 
 ```shell
 > tinyhouse-v1-server@0.1.0 start
@@ -390,4 +394,59 @@ Ahora vemos que en la consola nodemon muestra que ejecuta `ts-node src/index/ts`
 ```
 
 También gracias a `nodemon` cada vez que se modifique un archivo `.ts` volverá a ejecutar el servidor usando el paquete `ts-node`.
-`ts-node` por debajo hace un monto de comprobaciones para verificar que todo nuestro código TypeScript es correcto al compilar de typescript a codigo javascript valido. En caso de haber un error d e typescript, nodemon se bloqueara y mostrara el diagnostico de errores.
+`ts-node` por debajo hace un montón de comprobaciones para verificar que todo nuestro código TypeScript es correcto al momento de compilar de typescript a codigo javascript valido. En caso de haber un error de typescript, nodemon se bloqueara y mostrara el diagnostico de errores.
+
+## Compilando nuestro proyecto Typescript
+
+Es momento de compilar nuestro proyecto typescript a codigo javascript valido para producción. Pero el proyecto ya esta funcionado? Ps aunque el proyecto es adecuado para trabajar con typescript debemos compilarlo a codigo javascript ya que Typescript esta creados solo durante el desarrollo.
+
+Para compilar nuestro proyecto crearemos un script `build/` en nuestro package.json.
+
+```json
+"scripts": {
+    "start": "nodemon src/index.ts",
+    "build": ""
+},
+```
+
+### Comando `tsc`
+
+El script `build/` sera el responsable de compilar nuestro proyecto de codigo Typescript a Javascript valido, esto con la ayuda del comando `tsc` que proporciona el paquete typescript.
+Al ejecutar `tsc` debemos pasarle una bandera `-p` que es la abreviatura de `--project` lo que significa que nos permitirá compilar todo el codigo Typescript de un proyecto que tenga el archivo `tsconfig.json`. Ademas a `-p` o `--project` debemos darle como argumento el directorio del proyecto en este caso le pasamos `./` , este hace referencia al directorio _server/_ que es el directorio actual del proyecto donde se encuentra el `package.json`.
+
+_server/package.json_
+
+```json
+"scripts": {
+    "start": "nodemon src/index.ts",
+    "build": "tsc -p ./"
+  },
+```
+
+Ahora ejecutamos el script `build/` desde nuestra terminal:
+
+```shell
+npm run build
+```
+
+Empezara a ejecutar
+
+```shell
+➜  server git:(main) ✗ npm run build
+
+> tinyhouse-v1-server@0.1.0 build
+> tsc -p ./
+```
+
+Al terminar creara un nuevo directorio `server/build/` el cual contendrá el codigo javascript en `index/js` obtenido a traves de `index.ts` en typescript.
+Ahora si queremos correr ese codigo lo podemos hacer usando `node` desde el mismo directorio `build/`.
+
+```shell
+➜  server git:(main) ✗ node build/index.js
+
+[app] : http://localhost:9000
+```
+
+Ahora podemos ingresar desde el navegador a _http://localhost:9000_ y recibiremos el mismo resultado que en el typescript que sera enviado por la ruta index(/) en index.js.
+
+En el caso de querer hacer cambios o agregar nuevas características a nuestra app, casi nunca tenemos que ir a la carpeta `build/` para ver el javascript generado, simplemente volvemos a nuestro codigo typescript, hacemos los cambios, probamos y cuando estemos listos para implementar nuestra app en producción ejecutaremos nuevamente el script `build`

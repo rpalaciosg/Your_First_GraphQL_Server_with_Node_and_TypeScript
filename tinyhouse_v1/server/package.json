@@ -5,7 +5,8 @@
     "express": "^4.17.1"
   },
   "scripts": {
-    "start": "nodemon src/index.ts"
+    "start": "nodemon src/index.ts",
+    "build": "tsc -p ./"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
